@@ -1,0 +1,60 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class PreparedStatementDemo {
+	Connection dbCon;
+	PreparedStatement pstmt;
+	public PreparedStatementDemo() {
+		try {
+			dbCon = DriverManager.getConnection("jdbc:mysql://localhost:3306/ibmtraining?serverTimezone=IST", "root", "");
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+	}
+	public static void main(String[] args) {
+		PreparedStatementDemo demo = new PreparedStatementDemo();
+		//demo.queryTable();
+		demo.updateData();
+	}
+	public void queryTable() {
+		String fetchQry = "select * from user_details where user_id=?";
+		try {
+			pstmt = dbCon.prepareStatement(fetchQry);
+			pstmt.setInt(1, 4);
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				System.out.println("name: "+ rs.getString("user_name"));
+			}
+		}catch(Exception e){
+			System.out.println(e);
+		}
+		try {
+			dbCon.close();
+		} catch (SQLException e) {
+			System.out.println("Issues while closing the connection: "+e.getMessage());
+		}
+	}
+	
+	//update table
+	void updateData() {
+		String updateQry = "update user_details set user_name = ? where user_id = ?";
+		try {
+			pstmt = dbCon.prepareStatement(updateQry);
+			pstmt.setString(1, "Purvit");
+			pstmt.setInt(2, 2);
+			if(pstmt.executeUpdate()>0) {
+				System.out.println("done successfully");
+			}
+			else {
+				System.out.println("Failed");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+}
